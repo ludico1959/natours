@@ -1,0 +1,28 @@
+{
+  "name": "natours",
+  "version": "1.0.0",
+  "description": "Stundying node.js, express and mongodb",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ludico1959/natours.git"
+  },
+  "keywords": [
+    "tour"
+  ],
+  "author": "Lucas Dias Coelho",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ludico1959/natours/issues"
+  },
+  "homepage": "https://github.com/ludico1959/natours#readme",
+  "dependencies": {
+    "express": "^4.17.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}
