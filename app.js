@@ -1,9 +1,20 @@
 const fs = require('fs');
 const express = require('express');
+const res = require('express/lib/response');
 
 const app = express();
 // Middleware: function that can modify the incoming request data.
 app.use(express.json());
+
+app.use((req, res, next) => {
+  console.log('Hello from the moddleware! 🎃');
+  next();
+});
+
+app.use((req, res, next) => {
+  req.requestTime = new Date().toISOString();
+  next();
+});
 
 // JSON.parse() converts JSON into JS.
 const tours = JSON.parse(
@@ -11,8 +22,10 @@ const tours = JSON.parse(
 );
 
 const getAllTours = (req, res) => {
+  console.log(req.requestTime);
   res.status(200).json({
     status: 'success',
+    requestd_at: req.requestTime,
     results: tours.length,
     data: {
       tours: tours,
@@ -75,11 +88,8 @@ const deleteTour = (req, res) => {
 };
 
 // app.get('/api/v1/tours/:id', getTour);
-
 // app.post('/api/v1/tours', createTour);
-
 // app.patch('/api/v1/tours/:id', updateTour);
-
 // app.delete('/api/v1/tours/:id', deleteTour);
 
 app.route('/api/v1/tours/').get(getAllTours).post(createTour);
