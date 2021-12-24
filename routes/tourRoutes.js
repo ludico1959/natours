@@ -1,8 +1,13 @@
 const router = require('express').Router();
 const tourController = require('./../controllers/tourController');
 
-// ROUTES
+/**
+ * Param middlewar
+ * value holds the id param
+ */
+router.param('id', tourController.checkID);
 
+// ROUTES
 router
   .route('/')
   .get(tourController.getAllTours)
