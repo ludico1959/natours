@@ -20,7 +20,8 @@
   },
   "homepage": "https://github.com/ludico1959/natours#readme",
   "dependencies": {
-    "express": "^4.17.2"
+    "express": "^4.17.2",
+    "morgan": "^1.10.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.15"
