@@ -1,3 +1,4 @@
+/* eslint-disable prefer-object-spread */
 const fs = require('fs');
 
 // JSON.parse() converts JSON into JS.
@@ -23,16 +24,30 @@ exports.checkID = (req, res, next) => {
   return next();
 };
 
+exports.checkBody = (req, res, next) => {
+  const { name, price } = req.body;
+
+  if (!name || !price) {
+    return res.status(400).json({
+      status: 'fail',
+      message: `A tour registration missed ${
+        !name && !price ? 'name and price' : 'name or price'
+      }.`,
+    });
+  }
+
+  next();
+};
+
 // ROUTES HANDLERS
-exports.getAllTours = (req, res) => {
-  return res.status(200).json({
+exports.getAllTours = (req, res) =>
+  res.status(200).json({
     status: 'success',
     results: tours.length,
     data: {
       tours: tours,
     },
   });
-};
 
 exports.getTour = (req, res) => {
   const tour = tours.find((element) => element.id === Number(req.params.id));
@@ -54,29 +69,27 @@ exports.createTour = (req, res) => {
   fs.writeFile(
     `${__dirname}/dev-data/data/tours-simple.json`,
     JSON.stringify(tours),
-    (error) => {
-      return res.status(201).json({
+    // eslint-disable-next-line no-unused-vars
+    (error) =>
+      res.status(201).json({
         status: 'success',
         data: {
           tour: newTour,
         },
-      });
-    }
+      })
   );
 };
 
-exports.updateTour = (req, res) => {
-  return res.status(200).json({
+exports.updateTour = (req, res) =>
+  res.status(200).json({
     status: 'sucess',
     data: {
       tour: '<Updated tour...>',
     },
   });
-};
 
-exports.deleteTour = (req, res) => {
-  return res.status(204).json({
+exports.deleteTour = (req, res) =>
+  res.status(204).json({
     status: 'success',
     data: null,
   });
-};

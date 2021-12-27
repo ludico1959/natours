@@ -1,4 +1,5 @@
 const dotenv = require('dotenv');
+
 dotenv.config({ path: './config.env' });
 // You have to read the environment variables before require the app file.
 
