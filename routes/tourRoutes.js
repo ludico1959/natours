@@ -5,7 +5,7 @@ const tourController = require('../controllers/tourController');
  * Param middlewar
  * value holds the id param
  */
-router.param('id', tourController.checkID);
+// router.param('id', tourController.checkID);
 
 // ROUTES
 router
