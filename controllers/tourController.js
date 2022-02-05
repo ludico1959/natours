@@ -3,14 +3,13 @@ const Tour = require('../models/tourModel');
 exports.getAllTours = async (req, res) => {
   try {
     // BUILD QUERY:
-    // 1) Filtering:
+    // 1a) Filtering:
     const queryObj = { ...req.query };
     const excludedFields = ['page', 'sort', 'limit', 'fields'];
 
     excludedFields.forEach((element) => delete queryObj[element]);
-    console.log(req.query, queryObj);
 
-    // 2) Advanced filtering:
+    // 1b) Advanced filtering:
     /* EXAMPLES:
      * req.query from 'localhost:3000/api/v1/tours?duration[gte]=5&difficulty=easy&page=2'
      * { difficulty: 'easy', duration: { gte: 5 } }
@@ -25,12 +24,27 @@ exports.getAllTours = async (req, res) => {
       /\b(gte|gt|lte|lt)\b/g,
       (match) => `$${match}`
     );
-    console.log(JSON.parse(queryString));
 
-    const query = await Tour.find(JSON.parse(queryString));
+    let query = Tour.find(JSON.parse(queryString));
+
+    // 2) Sorting:
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(',').join(' ');
+      query = query.sort(sortBy);
+    } else {
+      query = query.sort('-createdAt');
+    }
+
+    // 3) Field limiting:
+    if (req.query.fields) {
+      const fields = req.query.fields.split(',').join(' ');
+      query = query.select(fields);
+    } else {
+      query = query.select('-__v');
+    }
 
     // EXECUTE QUERY:
-    const tours = query;
+    const tours = await query;
 
     /* Another way to use .find() method with query params:
      * const tours = await Tour.find()

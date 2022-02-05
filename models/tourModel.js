@@ -50,8 +50,9 @@ const tourSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now(), // In MongoDB, this date function is converted in a normal date format.
+    select: false,
   },
-  startDate: [Date],
+  startDates: [Date],
 });
 
 // Model:
