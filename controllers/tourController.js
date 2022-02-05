@@ -1,4 +1,5 @@
 const Tour = require('../models/tourModel');
+const APIFeatures = require('../utils/apiFeatures');
 
 exports.aliasTopTours = (req, res, next) => {
   req.query.limit = '5';
@@ -9,70 +10,14 @@ exports.aliasTopTours = (req, res, next) => {
 
 exports.getAllTours = async (req, res) => {
   try {
-    // BUILD QUERY:
-    // 1a) Filtering:
-    const queryObj = { ...req.query };
-    const excludedFields = ['page', 'sort', 'limit', 'fields'];
+    const features = new APIFeatures(Tour.find(), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+    // To chain all this methods, it's important to alwais add 'return this' at the end of the method.
 
-    excludedFields.forEach((element) => delete queryObj[element]);
-
-    // 1b) Advanced filtering:
-    /* EXAMPLES:
-     * req.query from 'localhost:3000/api/v1/tours?duration[gte]=5&difficulty=easy&page=2'
-     * { difficulty: 'easy', duration: { gte: 5 } }
-     *
-     * MongoDB operation
-     * { difficulty: 'easy', duration: { $gte: 5 } }
-     *
-     * We need to add '$' to gte, gt, lte and lt.
-     */
-    let queryString = JSON.stringify(queryObj);
-    queryString = queryString.replace(
-      /\b(gte|gt|lte|lt)\b/g,
-      (match) => `$${match}`
-    );
-
-    let query = Tour.find(JSON.parse(queryString));
-
-    // 2) Sorting:
-    if (req.query.sort) {
-      const sortBy = req.query.sort.split(',').join(' ');
-      query = query.sort(sortBy);
-    } else {
-      query = query.sort('-createdAt');
-    }
-
-    // 3) Field limiting:
-    if (req.query.fields) {
-      const fields = req.query.fields.split(',').join(' ');
-      query = query.select(fields);
-    } else {
-      query = query.select('-__v');
-    }
-
-    // 4) Pagination:
-    const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
-
-    query = query.skip(skip).limit(limit);
-
-    if (req.query.page) {
-      const numberOfTours = await Tour.countDocuments();
-
-      if (skip >= numberOfTours) throw new Error();
-    }
-
-    // EXECUTE QUERY:
-    const tours = await query;
-
-    /* Another way to use .find() method with query params:
-     * const tours = await Tour.find()
-     *   .where('duration')
-     *   .gte(6)
-     *   .where('difficulty')
-     *   .equals('easy');
-     */
+    const tours = await features.query;
 
     // SEND RESPONSE:
     res.status(200).json({
