@@ -7,7 +7,7 @@ dotenv.config({ path: './config.env' });
 const app = require('./app');
 
 // Connect to the remote MongoDB database:
-const DB = process.env.DATABASE.replace(
+const DB = process.env.DATABASE_URL.replace(
   '<PASSWORD>',
   process.env.DATABASE_PASSWORD
 );

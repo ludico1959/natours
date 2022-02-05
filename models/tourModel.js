@@ -4,21 +4,21 @@ const mongoose = require('mongoose');
 const tourSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, 'A tour must have a name 🎐'],
+    required: [true, 'A tour must have a name'],
     unique: true,
     trim: true,
   },
   duration: {
     type: Number,
-    required: [true, 'A tour must have a duration 🎐'],
+    required: [true, 'A tour must have a duration'],
   },
   maxGroupSize: {
     type: String,
-    required: [true, 'A tour must have a difficulty 🎐'],
+    required: [true, 'A tour must have a difficulty'],
   },
   difficulty: {
     type: String,
-    required: [true, 'A tour must have a maximum group size 🎐'],
+    required: [true, 'A tour must have a maximum group size'],
   },
   ratingAvarage: {
     type: Number,
@@ -30,13 +30,13 @@ const tourSchema = new mongoose.Schema({
   },
   price: {
     type: Number,
-    required: [true, 'A tour must have a price 🎐'],
+    required: [true, 'A tour must have a price'],
   },
   priceDiscount: Number,
   summary: {
     type: String,
     trim: true, // Remove all empty space in the beginning and in the end of the string.
-    required: [true, 'A tour must have a description 🎐'],
+    required: [true, 'A tour must have a description'],
   },
   description: {
     type: String,
@@ -44,7 +44,7 @@ const tourSchema = new mongoose.Schema({
   },
   imageCover: {
     type: String, // Just the name of the image, like a reference.
-    required: [true, 'A tour must have a cover image 🎐'],
+    required: [true, 'A tour must have a cover image'],
   },
   images: [String], // Set a array which elements are strings.
   createdAt: {

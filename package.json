@@ -4,8 +4,10 @@
   "description": "Stundying node.js, express and mongodb",
   "main": "app.js",
   "scripts": {
-    "start:dev": "nodemon server.js",
-    "start:prod": "NODE_ENV=production nodemon server.js"
+    "start:dev": "cross-env NODE_ENV=development nodemon server.js",
+    "start:prod": "cross-env NODE_ENV=production nodemon server.js",
+    "start:import": "node dev-data/data/import-dev-data.js --import",
+    "start:delete": "node dev-data/data/import-dev-data.js --delete"
   },
   "repository": {
     "type": "git",
@@ -24,9 +26,11 @@
     "dotenv": "^10.0.0",
     "express": "^4.17.2",
     "mongoose": "^6.1.4",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "npm-install-peers": "^1.2.2"
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "eslint": "^8.5.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-airbnb-base": "^15.0.0",

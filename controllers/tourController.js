@@ -1,11 +1,5 @@
 const Tour = require('../models/tourModel');
 
-/**
- * Param middlewar
- * value holds the id param
- */
-
-// ROUTES HANDLERS
 exports.getAllTours = async (req, res) => {
   try {
     const tours = await Tour.find();
