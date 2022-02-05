@@ -6,8 +6,8 @@
   "scripts": {
     "start:dev": "cross-env NODE_ENV=development nodemon server.js",
     "start:prod": "cross-env NODE_ENV=production nodemon server.js",
-    "start:import": "node dev-data/data/import-dev-data.js --import",
-    "start:delete": "node dev-data/data/import-dev-data.js --delete"
+    "import": "node dev-data/data/import-dev-data.js --import",
+    "delete": "node dev-data/data/import-dev-data.js --delete"
   },
   "repository": {
     "type": "git",

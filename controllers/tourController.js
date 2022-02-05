@@ -2,8 +2,45 @@ const Tour = require('../models/tourModel');
 
 exports.getAllTours = async (req, res) => {
   try {
-    const tours = await Tour.find();
+    // BUILD QUERY:
+    // 1) Filtering:
+    const queryObj = { ...req.query };
+    const excludedFields = ['page', 'sort', 'limit', 'fields'];
 
+    excludedFields.forEach((element) => delete queryObj[element]);
+    console.log(req.query, queryObj);
+
+    // 2) Advanced filtering:
+    /* EXAMPLES:
+     * req.query from 'localhost:3000/api/v1/tours?duration[gte]=5&difficulty=easy&page=2'
+     * { difficulty: 'easy', duration: { gte: 5 } }
+     *
+     * MongoDB operation
+     * { difficulty: 'easy', duration: { $gte: 5 } }
+     *
+     * We need to add '$' to gte, gt, lte and lt.
+     */
+    let queryString = JSON.stringify(queryObj);
+    queryString = queryString.replace(
+      /\b(gte|gt|lte|lt)\b/g,
+      (match) => `$${match}`
+    );
+    console.log(JSON.parse(queryString));
+
+    const query = await Tour.find(JSON.parse(queryString));
+
+    // EXECUTE QUERY:
+    const tours = query;
+
+    /* Another way to use .find() method with query params:
+     * const tours = await Tour.find()
+     *   .where('duration')
+     *   .gte(6)
+     *   .where('difficulty')
+     *   .equals('easy');
+     */
+
+    // SEND RESPONSE:
     res.status(200).json({
       status: 'success',
       result: tours.length,

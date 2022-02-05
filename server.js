@@ -1,9 +1,8 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 
-dotenv.config({ path: './config.env' });
 // You have to read the environment variables before require the app file.
-
+dotenv.config({ path: './config.env' });
 const app = require('./app');
 
 // Connect to the remote MongoDB database:
