@@ -27,7 +27,8 @@
     "express": "^4.17.2",
     "mongoose": "^6.1.4",
     "morgan": "^1.10.0",
-    "npm-install-peers": "^1.2.2"
+    "npm-install-peers": "^1.2.2",
+    "slugify": "^1.6.5"
   },
   "devDependencies": {
     "cross-env": "^7.0.3",
