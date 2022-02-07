@@ -26,9 +26,30 @@ app.use('/api/v1/users', userRouter);
 
 // '.all' means all HTTP methods: '.get', '.post', '.put', '.patch', 'delete'
 app.all('*', (req, res, next) => {
-  res.status(404).json({
-    status: 'fail',
-    message: `Can't find ${req.originalUrl} on this server 🚫`,
+  // res.status(404).json({
+  //   status: 'fail',
+  //   message: `Can't find ${req.originalUrl} on this server 🚫`,
+  // });
+
+  const error = new Error(`Can't find ${req.originalUrl} on this server 🚫`);
+  error.status = 'fail';
+  error.statusCode = 404;
+
+  next(error);
+  /* If you pass anything as an argument in the next() function,
+   * Node will automaticaly assume that it's an error.
+   * And it will go directly to the glocal ERROR HANDLING MIDDLEWARE, no matter where it is.
+   */
+});
+
+// ERROR HANDLING MIDDLEWARE
+app.use((error, req, res, next) => {
+  error.statusCode = error.statusCode || 500;
+  error.status = error.status || 'error';
+
+  res.status(error.statusCode).json({
+    status: error.status,
+    message: error.message,
   });
 });
 
