@@ -68,7 +68,10 @@ const tourSchema = new mongoose.Schema(
 );
 
 /////////////////////////////////////////////////////////////////////
-// DOCUMENT MIDDLEWARE: runs before .save() and .create()
+/* DOCUMENT MIDDLEWARE
+ * .pre: runs before .save() and .create()
+ * .post: runs after .save() and .create()
+ */
 tourSchema.pre('save', function (next) {
   // 'this.' can't be used in a arrow function.
   this.slug = slugify(this.name, { lower: true });
@@ -86,9 +89,24 @@ tourSchema.pre('save', function (next) {
 // });
 
 /////////////////////////////////////////////////////////////////////
-// QUERY MIDDLEWARE: runs before .find()
-tourSchema.pre('find', function (next) {
+/* QUERY MIDDLEWARE
+ * .pre: runs before a query and, in this case, the query is anyome who start with 'find' (regex)
+ * .post: runs after a query and, in this case, the query is anyome who start with 'find' (regex)
+ */
+tourSchema.pre(/^find/, function (next) {
+  // 'this.' points to the query and chain to it another find method
   this.find({ secretTour: { $ne: true } });
+
+  // >>> Let's see how much time it takes to do this request!
+  this.start = Date.now();
+  next();
+});
+
+tourSchema.post(/^find/, function (docs, next) {
+  // console.log(docs);
+
+  // >>> Let's see how much time it takes to do this request!
+  console.log(`Query took ${Date.now() - this.start} milliseconds ⏲`);
   next();
 });
 
