@@ -22,5 +22,14 @@ app.use((req, res, next) => {
 // ROUTES
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
+// If the request didn't get into these two URL's, it will reach the middleware below:
+
+// '.all' means all HTTP methods: '.get', '.post', '.put', '.patch', 'delete'
+app.all('*', (req, res, next) => {
+  res.status(404).json({
+    status: 'fail',
+    message: `Can't find ${req.originalUrl} on this server 🚫`,
+  });
+});
 
 module.exports = app;
