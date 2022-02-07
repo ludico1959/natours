@@ -102,15 +102,21 @@ tourSchema.pre(/^find/, function (next) {
   next();
 });
 
-tourSchema.post(/^find/, function (docs, next) {
-  // console.log(docs);
+/////////////////////////////////////////////////////////////////////
+/* AGGREGATION MIDDLEWARE
+ * .pre: runs before an aggregation
+ * .post: runs after an aggregation
+ */
 
-  // >>> Let's see how much time it takes to do this request!
-  console.log(`Query took ${Date.now() - this.start} milliseconds ⏲`);
+tourSchema.pre('aggregate', function (next) {
+  console.log(this.pipeline());
+
+  // Add this object below to the pipeline array!
+  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
   next();
 });
 
-// VIRTUAL PROPERTIES:
+// VIRTUAL PROPERTIES: tey are not saved in the database
 tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });
