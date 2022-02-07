@@ -1,5 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
+const AppError = require('./utils/appError');
+const globalErrorHandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 
@@ -26,16 +28,19 @@ app.use('/api/v1/users', userRouter);
 
 // '.all' means all HTTP methods: '.get', '.post', '.put', '.patch', 'delete'
 app.all('*', (req, res, next) => {
+  // Version #1:
   // res.status(404).json({
   //   status: 'fail',
   //   message: `Can't find ${req.originalUrl} on this server 🚫`,
   // });
 
-  const error = new Error(`Can't find ${req.originalUrl} on this server 🚫`);
-  error.status = 'fail';
-  error.statusCode = 404;
+  // Version #2:
+  // const error = new Error(`Can't find ${req.originalUrl} on this server 🚫`);
+  // error.status = 'fail';
+  // error.statusCode = 404;
+  // next (error);
 
-  next(error);
+  next(new AppError(`Can't find ${req.originalUrl} on this server 🚫`, 404));
   /* If you pass anything as an argument in the next() function,
    * Node will automaticaly assume that it's an error.
    * And it will go directly to the glocal ERROR HANDLING MIDDLEWARE, no matter where it is.
@@ -43,14 +48,6 @@ app.all('*', (req, res, next) => {
 });
 
 // ERROR HANDLING MIDDLEWARE
-app.use((error, req, res, next) => {
-  error.statusCode = error.statusCode || 500;
-  error.status = error.status || 'error';
-
-  res.status(error.statusCode).json({
-    status: error.status,
-    message: error.message,
-  });
-});
+app.use(globalErrorHandler);
 
 module.exports = app;
