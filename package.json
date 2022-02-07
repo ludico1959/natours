@@ -28,7 +28,8 @@
     "mongoose": "^6.1.4",
     "morgan": "^1.10.0",
     "npm-install-peers": "^1.2.2",
-    "slugify": "^1.6.5"
+    "slugify": "^1.6.5",
+    "validator": "^13.7.0"
   },
   "devDependencies": {
     "cross-env": "^7.0.3",

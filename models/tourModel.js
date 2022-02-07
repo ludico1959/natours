@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
+const validator = require('validator');
 
 // Schema:
 const tourSchema = new mongoose.Schema(
@@ -11,6 +12,7 @@ const tourSchema = new mongoose.Schema(
       trim: true,
       maxlength: [40, 'A tour name must have less or equal than 40 charcters'],
       minlength: [10, 'A tour name must have more or equal than 10 charcters'],
+      validate: [validator.isAlpha, 'Tour name must only contain characters'],
     },
     slug: String,
     duration: {
@@ -49,6 +51,7 @@ const tourSchema = new mongoose.Schema(
         message:
           'Discount price (US$ {VALUE}) should be below the regular price',
         validator: function (value) {
+          // This only points to current doc on NEW document creation (so it does not work for updating)
           return value < this.price;
         },
       },
@@ -88,6 +91,7 @@ const tourSchema = new mongoose.Schema(
 /* DOCUMENT MIDDLEWARE
  * .pre: runs before .save() and .create()
  * .post: runs after .save() and .create()
+ * It does not run before updates!
  */
 tourSchema.pre('save', function (next) {
   // 'this.' can't be used in a arrow function.
