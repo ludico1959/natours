@@ -76,7 +76,7 @@ exports.updateTour = async (req, res) => {
   try {
     const modifiedTour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
       new: true, // Make the promise return the modified document instead of the old one.
-      runValidators: true, // Validates the update operation against the model's schema.
+      runValidators: true, // Validates the update operation through the model's schema validators.
     });
 
     res.status(200).json({
