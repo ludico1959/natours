@@ -43,7 +43,16 @@ const tourSchema = new mongoose.Schema(
       type: Number,
       required: [true, 'A tour must have a price'],
     },
-    priceDiscount: Number,
+    priceDiscount: {
+      type: Number,
+      validate: {
+        message:
+          'Discount price (US$ {VALUE}) should be below the regular price',
+        validator: function (value) {
+          return value < this.price;
+        },
+      },
+    },
     summary: {
       type: String,
       trim: true, // Remove all empty space in the beginning and in the end of the string.
