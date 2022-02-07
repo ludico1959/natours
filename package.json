@@ -6,8 +6,9 @@
   "scripts": {
     "start:dev": "cross-env NODE_ENV=development nodemon server.js",
     "start:prod": "cross-env NODE_ENV=production nodemon server.js",
-    "import": "node dev-data/data/import-dev-data.js --import",
-    "delete": "node dev-data/data/import-dev-data.js --delete"
+    "data:import": "node dev-data/data/import-dev-data.js --import",
+    "data:delete": "node dev-data/data/import-dev-data.js --delete",
+    "debug": "cross-env NODE_ENV=development ndb server.js"
   },
   "repository": {
     "type": "git",
@@ -43,6 +44,7 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.28.0",
+    "ndb": "^1.1.5",
     "nodemon": "^2.0.15",
     "prettier": "^2.5.1"
   }
