@@ -56,6 +56,10 @@ const tourSchema = new mongoose.Schema(
       select: false,
     },
     startDates: [Date],
+    secretTour: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     toJSON: { virtuals: true },
@@ -63,6 +67,7 @@ const tourSchema = new mongoose.Schema(
   }
 );
 
+/////////////////////////////////////////////////////////////////////
 // DOCUMENT MIDDLEWARE: runs before .save() and .create()
 tourSchema.pre('save', function (next) {
   // 'this.' can't be used in a arrow function.
@@ -70,13 +75,20 @@ tourSchema.pre('save', function (next) {
   next();
 });
 
-tourSchema.pre('save', (next) => {
-  console.log('Will save document... 💾');
-  next();
-});
+// tourSchema.pre('save', (next) => {
+//   console.log('Will save document... 💾');
+//   next();
+// });
 
-tourSchema.post('save', (doc, next) => {
-  console.log(doc);
+// tourSchema.post('save', (doc, next) => {
+//   console.log(doc);
+//   next();
+// });
+
+/////////////////////////////////////////////////////////////////////
+// QUERY MIDDLEWARE: runs before .find()
+tourSchema.pre('find', function (next) {
+  this.find({ secretTour: { $ne: true } });
   next();
 });
 
