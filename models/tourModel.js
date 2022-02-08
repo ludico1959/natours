@@ -85,6 +85,7 @@ const tourSchema = new mongoose.Schema(
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
+    id: false, // Mongoose by default adds a virtual property called "id" to your model.
   }
 );
 
@@ -141,7 +142,7 @@ tourSchema.pre('aggregate', function (next) {
 /////////////////////////////////////////////////////////////////////
 /* VIRTUAL PROPERTIES
  * They are not saved in the database.
- * Mongoose by default adds a virtual property called "id" to your model
+ * Mongoose by default adds a virtual property called "id" to your model.
  */
 tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
