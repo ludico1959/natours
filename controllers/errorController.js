@@ -15,6 +15,14 @@ const handleDuplicateFieldsDB = (error) => {
   return new AppError(message, 400);
 };
 
+const handleValidationErrorDB = (error) => {
+  const errors = Object.values(error.errors).map((element) => element.message);
+
+  const message = `Invalid input data. ${errors.join('. ')}.`;
+
+  return new AppError(message, 400);
+};
+
 // DEV AND PROD ERROR RESPONSES
 const sendErrorDev = (error, res) => {
   res.status(error.statusCode).json({
@@ -56,7 +64,8 @@ module.exports = (error, req, res, next) => {
 
     if (err.name === 'CastError') err = handleCastErrorDB(err);
     if (err.code === 11000) err = handleDuplicateFieldsDB(err);
-    // err.name and err.code were gotten from Postman error response!
+    if (err.name === 'ValidationError') err = handleValidationErrorDB(err);
+    // err.name and err.code were gotten from Postman error response using development environment!
 
     sendErrorProd(err, res);
   }
