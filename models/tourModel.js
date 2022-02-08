@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 const slugify = require('slugify');
 // const validator = require('validator');
 
-// Schema:
+/////////////////////////////////////////////////////////////////////
+// SCHEMA
 const tourSchema = new mongoose.Schema(
   {
     name: {
@@ -88,7 +89,7 @@ const tourSchema = new mongoose.Schema(
 );
 
 /////////////////////////////////////////////////////////////////////
-/* DOCUMENT MIDDLEWARE
+/* DOCUMENT MIDDLEWARE:
  * .pre: runs before .save() and .create()
  * .post: runs after .save() and .create()
  * It does not run before updates!
@@ -137,12 +138,17 @@ tourSchema.pre('aggregate', function (next) {
   next();
 });
 
-// VIRTUAL PROPERTIES: tey are not saved in the database
+/////////////////////////////////////////////////////////////////////
+/* VIRTUAL PROPERTIES
+ * They are not saved in the database.
+ * Mongoose by default adds a virtual property called "id" to your model
+ */
 tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });
 
-// Model:
+/////////////////////////////////////////////////////////////////////
+// MODEL
 const Tour = mongoose.model('Tour', tourSchema);
 
 module.exports = Tour;
