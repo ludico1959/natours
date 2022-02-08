@@ -1,3 +1,11 @@
+const AppError = require('../utils/appError');
+
+const handleCastErrorDB = (error) => {
+  const message = `Invalid ${error.path}: ${error.value}.`;
+
+  return new AppError(message, 400);
+};
+
 const sendErrorDev = (error, res) => {
   res.status(error.statusCode).json({
     status: error.status,
@@ -17,7 +25,7 @@ const sendErrorProd = (error, res) => {
       message: error.message,
     });
   } else {
-    console.error('ERROR ❗❗❗', error);
+    // console.error('ERROR ❗❗❗', error);
 
     res.status(500).json({
       status: 'error',
@@ -33,6 +41,12 @@ module.exports = (error, req, res, next) => {
   if (process.env.NODE_ENV === 'development') {
     sendErrorDev(error, res);
   } else if (process.env.NODE_ENV === 'production') {
-    sendErrorProd(error, res);
+    // Make a hard copy of the error:
+    let err = Object.assign(error);
+
+    if (err.name === 'CastError') err = handleCastErrorDB(err);
+    // err.name was got from Postman error response!
+
+    sendErrorProd(err, res);
   }
 };
