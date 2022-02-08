@@ -18,8 +18,7 @@ mongoose
   })
   .then(() => console.log('Remote database connection successful 📡'));
 
-/**
- * See all environment variables:
+/* See all the environment variables
  * console.log(process.env);
  */
 

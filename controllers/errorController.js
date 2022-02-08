@@ -1,11 +1,21 @@
 const AppError = require('../utils/appError');
 
+// VALIDATION ERROR HANDLERS
 const handleCastErrorDB = (error) => {
   const message = `Invalid ${error.path}: ${error.value}.`;
 
   return new AppError(message, 400);
 };
 
+const handleDuplicateFieldsDB = (error) => {
+  const duplicatedName = error.errmsg.match(/(["'])(?:(?=(\\?))\2.)*?\1/)[0];
+
+  const message = `Duplicated field value: ${duplicatedName}. Please use another one!`;
+
+  return new AppError(message, 400);
+};
+
+// DEV AND PROD ERROR RESPONSES
 const sendErrorDev = (error, res) => {
   res.status(error.statusCode).json({
     status: error.status,
@@ -45,7 +55,8 @@ module.exports = (error, req, res, next) => {
     let err = Object.assign(error);
 
     if (err.name === 'CastError') err = handleCastErrorDB(err);
-    // err.name was got from Postman error response!
+    if (err.code === 11000) err = handleDuplicateFieldsDB(err);
+    // err.name and err.code were gotten from Postman error response!
 
     sendErrorProd(err, res);
   }
