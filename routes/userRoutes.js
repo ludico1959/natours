@@ -1,7 +1,11 @@
 const router = require('express').Router();
-const userController = require('./../controllers/userController');
+const userController = require('../controllers/userController');
+const authController = require('../controllers/authController');
 
 // ROUTES
+// Notice that this is not a REST endpoint.
+router.post('/signup', authController.signup);
+
 router
   .route('/')
   .get(userController.getAllUsers)
