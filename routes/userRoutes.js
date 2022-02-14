@@ -3,8 +3,9 @@ const userController = require('../controllers/userController');
 const authController = require('../controllers/authController');
 
 // ROUTES
-// Notice that this is not a REST endpoint.
+// Notice that these are not REST endpoints.
 router.post('/signup', authController.signup);
+router.post('/login', authController.login);
 
 router
   .route('/')

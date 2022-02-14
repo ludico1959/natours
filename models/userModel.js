@@ -22,6 +22,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please, provide a password!'],
     minlength: 8,
+    select: false,
   },
   passwordConfirm: {
     type: String,
@@ -50,6 +51,15 @@ userSchema.pre('save', async function (next) {
 
   next();
 });
+
+// INSTANCE METHOD: function available in all user documents!
+userSchema.methods.correctPassword = async function (
+  candidatePassword,
+  userPassword
+) {
+  // Return true or false in the authController:
+  return await bcrypt.compare(candidatePassword, userPassword);
+};
 
 // Model variables are usually always with a capitl letter.
 const User = mongoose.model('User', userSchema);
