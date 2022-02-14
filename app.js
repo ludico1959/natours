@@ -28,7 +28,7 @@ app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 // If the request didn't get into these two URL's, it will reach the middleware below:
 
-// '.all' means all HTTP methods: '.get', '.post', '.put', '.patch', 'delete'
+// '.all' means all HTTP methods: '.get', '.post', '.put', '.patch', '.delete'
 app.all('*', (req, res, next) => {
   // Version #1:
   // res.status(404).json({
