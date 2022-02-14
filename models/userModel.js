@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -33,6 +34,21 @@ const userSchema = new mongoose.Schema({
       message: 'Passwords are not the same!',
     },
   },
+});
+
+// DOCUMENT MIDDLEWARE:
+userSchema.pre('save', async function (next) {
+  // Only run this function if the password is modified.
+  if (!this.isModified('password')) return next();
+
+  // The cost of 12 indicates how much CPU process intensity will be uded to encrypt the password.
+  const hash = await bcrypt.hash(this.password, 12);
+  this.password = hash;
+
+  // Delete the passwordConfirm field because it is used just for an user confirmation.
+  this.passwordConfirm = undefined;
+
+  next();
 });
 
 // Model variables are usually always with a capitl letter.
