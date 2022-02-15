@@ -9,6 +9,7 @@ const signToken = (id) =>
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 
+// ENDPOINTS:
 exports.signup = catchAsync(async (req, res, next) => {
   /* SECURITY !!!
    * This way no one can register as admin because only the properties below are created.
@@ -16,6 +17,7 @@ exports.signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create({
     name: req.body.name,
     email: req.body.email,
+    role: req.body.role,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
     passwordChangeAt: req.body.passwordChangeAt,
@@ -57,6 +59,7 @@ exports.login = catchAsync(async (req, res, next) => {
   });
 });
 
+// MIDDLEWARE:
 exports.protect = catchAsync(async (req, res, next) => {
   let token;
 
@@ -99,6 +102,20 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
 
   // GRANT ACESS TO PROTECT ROUTE 🎉🎉🎉
-  req.user = currentUser;
+  req.user = currentUser; // It's important to do this for the restricTo middleware below.
   next();
 });
+
+exports.restrictTo =
+  (...roles) =>
+  (req, res, next) => {
+    // roles is an array: ['admin', 'lead-guide'].
+    console.log(req.body, roles, ...roles);
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError('You do not have permition to perform this action.', 403)
+      );
+    }
+
+    next();
+  };
