@@ -18,6 +18,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     email: req.body.email,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
+    passwordChangeAt: req.body.passwordChangeAt,
   });
 
   const token = signToken(newUser._id);
@@ -78,10 +79,12 @@ exports.protect = catchAsync(async (req, res, next) => {
     token,
     process.env.JWT_SECRET
   );
-  console.log(jwtDecodedPayload);
+  // console.log(jwtDecodedPayload);
 
   // 3) Check if user still exists.
-  if (!(await User.findById(jwtDecodedPayload.id)))
+  const freshUser = await User.findById(jwtDecodedPayload.id);
+
+  if (!freshUser)
     return next(
       new AppError(
         'The user belonging to this token does not longer exist.',
@@ -90,6 +93,12 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
 
   // 4) Check if user changed password after the JWT was issued.
+  if (freshUser.changedPasswordAfter(jwtDecodedPayload.iat))
+    return next(
+      new AppError('User recently changed password! Please log in again.', 401)
+    );
 
+  // GRANT ACESS TO PROTECT ROUTE 🎉🎉🎉
+  req.user = freshUser;
   next();
 });

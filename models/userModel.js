@@ -35,6 +35,7 @@ const userSchema = new mongoose.Schema({
       message: 'Passwords are not the same!',
     },
   },
+  passwordChangeAt: Date,
 });
 
 // DOCUMENT MIDDLEWARE:
@@ -52,13 +53,27 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-// INSTANCE METHOD: function available in all user documents!
+// INSTANCE METHODS: function available in all user documents!
 userSchema.methods.correctPassword = async function (
   candidatePassword,
   userPassword
 ) {
   // Return true or false in the authController:
   return await bcrypt.compare(candidatePassword, userPassword);
+};
+
+userSchema.methods.changedPasswordAfter = function (JWTTimeStamp) {
+  if (this.passwordChangeAt) {
+    const passwordChangeAtInSeconds = parseInt(
+      this.passwordChangeAt.getTime() / 1000,
+      10
+    );
+
+    return JWTTimeStamp < passwordChangeAtInSeconds;
+  }
+
+  // False means that the password was not changed.
+  return false;
 };
 
 // Model variables are usually always with a capitl letter.
