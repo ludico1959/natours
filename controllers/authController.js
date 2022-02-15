@@ -74,7 +74,7 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
   }
 
-  // 2) Verificate if token is correct.
+  // 2) MOST IMPORTANT: verificate if token is correct.
   const jwtDecodedPayload = await promisify(jwt.verify)(
     token,
     process.env.JWT_SECRET
