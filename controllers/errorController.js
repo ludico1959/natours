@@ -23,6 +23,12 @@ const handleValidationErrorDB = (error) => {
   return new AppError(message, 400);
 };
 
+const handleJWTError = () =>
+  new AppError('Invalid token! Please login again.', 401);
+
+const handleTokenExpiredError = () =>
+  new AppError('Your token has expired! Please login again.', 401);
+
 // DEV AND PROD ERROR RESPONSES
 const sendErrorDev = (error, res) => {
   res.status(error.statusCode).json({
@@ -59,14 +65,14 @@ module.exports = (error, req, res, next) => {
   if (process.env.NODE_ENV === 'development') {
     sendErrorDev(error, res);
   } else if (process.env.NODE_ENV === 'production') {
-    // Make a hard copy of the error:
-    let err = Object.assign(error);
+    if (error.name === 'CastError') error = handleCastErrorDB(error);
+    if (error.code === 11000) error = handleDuplicateFieldsDB(error);
+    if (error.name === 'ValidationError')
+      error = handleValidationErrorDB(error);
+    if (error.name === 'JsonWebTokenError') error = handleJWTError();
+    if (error.name === 'TokenExpiredError') error = handleTokenExpiredError();
+    // error.name and error.code were gotten from Postman error response using development environment!
 
-    if (err.name === 'CastError') err = handleCastErrorDB(err);
-    if (err.code === 11000) err = handleDuplicateFieldsDB(err);
-    if (err.name === 'ValidationError') err = handleValidationErrorDB(err);
-    // err.name and err.code were gotten from Postman error response using development environment!
-
-    sendErrorProd(err, res);
+    sendErrorProd(error, res);
   }
 };
