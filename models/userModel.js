@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
@@ -41,6 +42,8 @@ const userSchema = new mongoose.Schema({
     },
   },
   passwordChangeAt: Date,
+  passwordResetToken: String,
+  passwordResetExpires: Date,
 });
 
 // DOCUMENT MIDDLEWARE:
@@ -79,6 +82,22 @@ userSchema.methods.changedPasswordAfter = function (JWTTimeStamp) {
 
   // False means that the password was not changed.
   return false;
+};
+
+userSchema.methods.createPasswordResetToken = function () {
+  const resetToken = crypto.randomBytes(32).toString('hex');
+
+  this.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+  console.log({ resetToken }, this.passwordResetToken);
+
+  // The token expires in 10 minutes! So you have 10 min to use it to reset your password.
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
+  return resetToken;
 };
 
 // Model variables are usually always with a capitl letter.
