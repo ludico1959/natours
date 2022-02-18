@@ -61,6 +61,15 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
+userSchema.pre('save', function (next) {
+  if (!this.isModified('password') || this.isNew) return next();
+
+  // "-1000" is here because sometimes the token is created a bit before the change password timestamp.
+  // This is a small hack is not accurate, but it ensure that the token is always created after.
+  this.passwordChangeAt = Date.now() - 1000;
+  next();
+});
+
 // INSTANCE METHODS: function available in all user documents!
 userSchema.methods.correctPassword = async function (
   candidatePassword,
