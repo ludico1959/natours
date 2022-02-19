@@ -11,6 +11,19 @@ const signToken = (id) =>
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 
+// This function is ere because it was repeated at least 3 times in the code!
+const createAndSendToken = (user, statusCode, res) => {
+  const token = signToken(user._id);
+
+  res.status(statusCode).json({
+    status: 'success',
+    token,
+    data: {
+      user,
+    },
+  });
+};
+
 // ENDPOINTS:
 exports.signup = catchAsync(async (req, res, next) => {
   /* SECURITY !!!
@@ -25,15 +38,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     passwordChangeAt: req.body.passwordChangeAt,
   });
 
-  const token = signToken(newUser._id);
-
-  res.status(201).json({
-    status: 'success',
-    token,
-    data: {
-      user: newUser,
-    },
-  });
+  createAndSendToken(newUser, 201, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -53,12 +58,7 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   // 3) If everything is OK, send token to the client.
-  const token = signToken(user._id);
-
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+  createAndSendToken(user, 200, res);
 });
 
 // MIDDLEWARE:
@@ -104,7 +104,7 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
 
   // GRANT ACESS TO PROTECT ROUTE 🎉🎉🎉
-  req.user = currentUser; // It's important to do this for the restricTo middleware below.
+  req.user = currentUser; // It's important to do this for the restricTo and updatePassword middlewares below.
   next();
 });
 
@@ -194,10 +194,28 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   // 3) Update changePasswordAt property for the user.
 
   // 4) Log the user in, send JWT.
-  const token = signToken(user._id);
+  createAndSendToken(user, 200, res);
+});
 
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  // 1) Get user from the collection.
+  const user = await User.findById(req.user.id).select('+password');
+
+  // 2) Check if POSTed current password is correct.
+  if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+    return next(new AppError('Your current password is wrong', 401));
+  }
+
+  // 3) If so, update password.
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+
+  await user.save();
+  /* User.findByIdAndUpdate() will not word here!
+   * userSchema validate at passwordConfirm key and models's document middlewares just work with:
+   * '.save' and '.create'
+   */
+
+  // 4) Log user in, send JWT.
+  createAndSendToken(user, 200, res);
 });
