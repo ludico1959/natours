@@ -4,7 +4,7 @@ const authController = require('../controllers/authController');
 
 // ROUTES
 /////////////////////////////////////////////////////////////////////////////////////////
-// AUTHCONTROLLER routers: notice that these are not REST endpoints.
+// authController routers: notice that these are not REST endpoints.
 router.post('/signup', authController.signup);
 router.post('/login', authController.login);
 
@@ -18,7 +18,9 @@ router.patch(
 );
 
 /////////////////////////////////////////////////////////////////////////////////////////
-// USERCONTROLLER routers
+// userController routers
+router.patch('/updateMe', authController.protect, userController.updateMe);
+
 router
   .route('/')
   .get(userController.getAllUsers)
