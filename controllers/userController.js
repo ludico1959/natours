@@ -57,6 +57,16 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.deleteMe = catchAsync(async (req, res, next) => {
+  // REMENBER: The user is logged in, so the variable 'user' has all the user information!
+  await User.findByIdAndUpdate(req.user.id, { active: false });
+
+  res.status(204).json({
+    status: 'success',
+    data: null,
+  });
+});
+
 exports.createUser = (req, res) =>
   res.status(500).json({
     status: 'error',
