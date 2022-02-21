@@ -4,6 +4,7 @@ const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
+const hpp = require('hpp');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRoutes');
@@ -58,8 +59,26 @@ app.use(
  */
 app.use(mongoSanitize());
 
-// Data sanitization against XSS (Cross-site Scripting) attacks.
+// Data sanitization against XSS (Cross-site Scripting) attacks:
 app.use(xss());
+
+/* Prevent parameter pollution:
+ * For example this URL:
+ * http://localhost:3000/api/v1/tours?page=2$page=1
+ * This don't apply to the whitelist keys.
+ */
+app.use(
+  hpp({
+    whitelist: [
+      'duration',
+      'difficulty',
+      'ratingsAverage',
+      'ratingsQuantity',
+      'maxGroupSize',
+      'price',
+    ],
+  })
+);
 
 // Serving static files (example: http://localhost:3000/overview.html):
 app.use(express.static(`${__dirname}/public`));
