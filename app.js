@@ -1,6 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRoutes');
@@ -8,7 +9,12 @@ const userRouter = require('./routes/userRoutes');
 
 const app = express();
 
-// GLOBAL MIDDLEWARE
+// GLOBAL MIDDLEWARES
+// Set security HTTP headers:
+// Helmet is, in fact, a collection of multiple smaller middlwares that set HTTP response headers.
+app.use(helmet());
+
+// Development loggin:
 if (process.env.NODE_ENV === 'development') {
   app.use((req, res, next) => {
     console.log(
@@ -30,13 +36,25 @@ const limiter = rateLimit({
   message: 'Too many request from this IP! Please try again in an hour.',
 });
 
-// This only affects routes that start with '/api':
+// Limit requests from same IP (in this case, only affects routes that start with '/api'):
 app.use('/api', limiter);
 
-app.use(express.json());
+// Body parser (reading data from the body into req.body), limited to 10kb:
+app.use(
+  express.json({
+    limit: '10kb',
+  })
+);
 
-// Middleware serving static files, example: http://localhost:3000/overview.html
+// Serving static files (example: http://localhost:3000/overview.html):
 app.use(express.static(`${__dirname}/public`));
+
+// Test middleware: taking a look at the headers when we need it.
+app.use((req, res, next) => {
+  req.requestTime = new Date().toISOString();
+  // console.log(req.headers);
+  next();
+});
 
 // ROUTES
 app.use('/api/v1/tours', tourRouter);
