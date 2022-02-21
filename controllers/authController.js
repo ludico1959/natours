@@ -16,6 +16,23 @@ const signToken = (id) =>
 const createAndSendToken = (user, statusCode, res) => {
   const token = signToken(user._id);
 
+  /* The COOKIE OPTIONS in an Object assined to a variable:
+   * The expires propertie is the current time plus 90 (JWT_COOKIE_EXPIRES_IN=90) days in miliseconds.
+   * The httpOnly propertie means that the cookie can't be acessed or modified in any way by the browser.
+   */
+  const cookieOptions = {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
+    httpOnly: true,
+  };
+
+  // The secure propertie equals to 'true' means the cookie only will e sent on an encrypted connection (HTTPS).
+  if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
+
+  // Sending JWT via cookie ('jwt' is the cookie name).
+  res.cookie('jwt', token, cookieOptions);
+
   res.status(statusCode).json({
     status: 'success',
     token,
