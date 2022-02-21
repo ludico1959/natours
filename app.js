@@ -46,6 +46,16 @@ app.use(
   })
 );
 
+/* Data sanitization against NoSQL query injection.
+ * For example this 'Login user' request:
+ * {
+ *  "email": { "gt": "" },
+ *  "password": "anyUserPassword"
+ * }
+ */
+
+// Data sanitization against XSS (Cross-site Scripting) attacks.
+
 // Serving static files (example: http://localhost:3000/overview.html):
 app.use(express.static(`${__dirname}/public`));
 
